@@ -3,13 +3,13 @@ package middleware
 import (
 	"net/http"
 
+	"github.com/Raghvvv/tasker/internal/errs"
+	"github.com/Raghvvv/tasker/internal/server"
+	"github.com/Raghvvv/tasker/internal/sqlerr"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	"github.com/pkg/errors"
 	"github.com/rs/zerolog"
-	"github.com/sriniously/go-task_app/internal/errs"
-	"github.com/sriniously/go-task_app/internal/server"
-	"github.com/sriniously/go-task_app/internal/sqlerr"
 )
 
 type GlobalMiddlewares struct {

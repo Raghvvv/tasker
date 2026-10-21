@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/sriniously/go-task_app/internal/server"
+	"github.com/Raghvvv/tasker/internal/server"
 
 	"github.com/labstack/echo/v4"
 )

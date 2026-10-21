@@ -1,9 +1,9 @@
 package job
 
 import (
+	"github.com/Raghvvv/tasker/internal/config"
 	"github.com/hibiken/asynq"
 	"github.com/rs/zerolog"
-	"github.com/sriniously/go-task_app/internal/config"
 )
 
 type JobService struct {

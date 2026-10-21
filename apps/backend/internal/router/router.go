@@ -3,12 +3,12 @@ package router
 import (
 	"net/http"
 
+	"github.com/Raghvvv/tasker/internal/handler"
+	"github.com/Raghvvv/tasker/internal/middleware"
+	"github.com/Raghvvv/tasker/internal/server"
+	"github.com/Raghvvv/tasker/internal/service"
 	"github.com/labstack/echo/v4"
 	echoMiddleware "github.com/labstack/echo/v4/middleware"
-	"github.com/sriniously/go-task_app/internal/handler"
-	"github.com/sriniously/go-task_app/internal/middleware"
-	"github.com/sriniously/go-task_app/internal/server"
-	"github.com/sriniously/go-task_app/internal/service"
 	"golang.org/x/time/rate"
 )
 

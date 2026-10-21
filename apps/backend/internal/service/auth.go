@@ -1,7 +1,7 @@
 package service
 
 import (
-	"github.com/sriniously/go-task_app/internal/server"
+	"github.com/Raghvvv/tasker/internal/server"
 
 	"github.com/clerk/clerk-sdk-go/v2"
 )

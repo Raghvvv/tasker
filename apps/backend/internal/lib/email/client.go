@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"html/template"
 
+	"github.com/Raghvvv/tasker/internal/config"
 	"github.com/pkg/errors"
 	"github.com/resend/resend-go/v2"
 	"github.com/rs/zerolog"
-	"github.com/sriniously/go-task_app/internal/config"
 )
 
 type Client struct {

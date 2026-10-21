@@ -1,9 +1,9 @@
 package service
 
 import (
-	"github.com/sriniously/go-task_app/internal/lib/job"
-	"github.com/sriniously/go-task_app/internal/repository"
-	"github.com/sriniously/go-task_app/internal/server"
+	"github.com/Raghvvv/tasker/internal/lib/job"
+	"github.com/Raghvvv/tasker/internal/repository"
+	"github.com/Raghvvv/tasker/internal/server"
 )
 
 type Services struct {

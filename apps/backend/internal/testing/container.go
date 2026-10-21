@@ -6,11 +6,11 @@ import (
 	"testing"
 	"time"
 
+	"github.com/Raghvvv/tasker/internal/config"
+	"github.com/Raghvvv/tasker/internal/database"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/rs/zerolog"
-	"github.com/sriniously/go-task_app/internal/config"
-	"github.com/sriniously/go-task_app/internal/database"
 	"github.com/stretchr/testify/require"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"

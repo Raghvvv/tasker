@@ -1,7 +1,7 @@
 package router
 
 import (
-	"github.com/sriniously/go-task_app/internal/handler"
+	"github.com/Raghvvv/tasker/internal/handler"
 
 	"github.com/labstack/echo/v4"
 )
