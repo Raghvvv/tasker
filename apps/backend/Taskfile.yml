@@ -1,7 +1,7 @@
 version: '3'
-
+dotenv: ['.env']
 vars:
-  task_app_DB_DSN: '{{.task_app_DB_DSN | default ""}}'
+  task_app_DB_DSN: '{{.TASK_APP_DB_DSN | default .task_app_DB_DSN | default ""}}'
 
 tasks:
   help:
