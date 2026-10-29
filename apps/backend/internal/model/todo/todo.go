@@ -2,9 +2,12 @@ package todo
 
 import (
 	"time"
+
 	// "uuid"
 
 	"github.com/Raghvvv/tasker/internal/model"
+	"github.com/Raghvvv/tasker/internal/model/category"
+	"github.com/Raghvvv/tasker/internal/model/comment"
 	"github.com/google/uuid"
 )
 
@@ -46,4 +49,20 @@ type Todo struct {
 	CategoryID   *uuid.UUID `json:"categoryId" db:"category_id"`
 	Metadata     *Metadata  `json:"metadata" db:"metadata"`
 	SortOrder    int        `json:"sortOrder" db:"sort_order"`
+}
+
+type Populatedtodo struct {
+	Todo
+	Category *category.Category `json:"category" db:"category"`
+	Children []Todo             `json:"children" db:"children"`
+	Comments []comment.Comment  `json:"comments" db:"comments"`
+}
+
+type TodoStats struct {
+	Total     int `json:"total"`
+	Draft     int `json:"draft"`
+	Active    int `json:"active"`
+	Completed int `json:"completed"`
+	Archived  int `json:"archived"`
+	Overdue   int `json:"overdue"`
 }

@@ -5,7 +5,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type comment struct {
+type Comment struct {
 	model.Base
 	TodoId  uuid.UUID `json:"todoId" db:"todo_id"`
 	UserID  string    `json:"userId" db:"user_id"`
