@@ -374,3 +374,30 @@ func (r *TodoRepository) DeleteTodo(ctx context.Context, userID string, todoID u
 
 	return nil
 }
+
+func (r *TodoRepository) CheckTodoExists(ctx context.Context, userID string, todoID uuid.UUID) (*todo.Todo, error) {
+	stmt := `
+		SELECT
+			*
+		FROM
+			todos
+		WHERE
+			id=@id
+			AND user_id=@user_id
+	`
+
+	rows, err := r.server.DB.Pool.Query(ctx, stmt, pgx.NamedArgs{
+		"id":      todoID,
+		"user_id": userID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to check if todo exists for todo_id=%s user_id=%s: %w", todoID.String(), userID, err)
+	}
+
+	todoItem, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[todo.Todo])
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect row from table:todos for todo_id=%s user_id=%s: %w", todoID.String(), userID, err)
+	}
+
+	return &todoItem, nil
+}

@@ -66,3 +66,11 @@ type TodoStats struct {
 	Archived  int `json:"archived"`
 	Overdue   int `json:"overdue"`
 }
+
+func (t *Todo) CanHaveChildren() bool {
+	return t.ParentTodoID == nil
+}
+
+func (t *Todo) IsOverdue() bool {
+	return t.DueDate != nil && t.DueDate.Before(time.Now()) && t.Status != StatusCompleted
+}
