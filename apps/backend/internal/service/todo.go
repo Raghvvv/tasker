@@ -19,12 +19,12 @@ type TodoService struct {
 	categoryRepo *repository.CategoryRepository
 }
 
-func CreateTodoService(s *server.Server, todoRepo *repository.TodoRepository, categoryRepo *repository.CategoryRepository) (*TodoService, error) {
+func CreateTodoService(s *server.Server, todoRepo *repository.TodoRepository, categoryRepo *repository.CategoryRepository) *TodoService {
 	return &TodoService{
 		server:       s,
 		todoRepo:     todoRepo,
 		categoryRepo: categoryRepo,
-	}, nil
+	}
 }
 
 func (s *TodoService) CreateTodo(ctx echo.Context, payload *todo.CreateTodoPayload, userID string) (*todo.Todo, error) {

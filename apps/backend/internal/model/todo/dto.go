@@ -14,14 +14,14 @@ import (
 type CreateTodoPayload struct {
 	Title        string     `json:"title" validate:"required,min=1,max=255"`
 	Description  *string    `json:"description" validate:"omitempty,max=1000"`
-	Priority     *Priority  `json:"priority" validate:"omitempty, oneof=medium low high"`
+	Priority     *Priority  `json:"priority" validate:"omitempty,oneof=medium low high"`
 	DueDate      *time.Time `json:"dueDate"`
 	ParentTodoID *uuid.UUID `json:"parentTodoId" validate:"omitempty,uuid"`
 	CategoryID   *uuid.UUID `json:"categoryId" validate:"omitempty,uuid"`
 	Metadata     *Metadata  `json:"metadata"`
 }
 
-func (p *CreateTodoPayload) validate() error {
+func (p *CreateTodoPayload) Validate() error {
 	validate := validator.New()
 
 	return validate.Struct(p)
@@ -41,7 +41,7 @@ type UpdateTodoPayload struct {
 	Metadata     *Metadata  `json:"metadata"`
 }
 
-func (p *UpdateTodoPayload) validate() error {
+func (p *UpdateTodoPayload) Validate() error {
 	validate := validator.New()
 	return validate.Struct(p)
 }
@@ -64,7 +64,7 @@ type GetTodoQuery struct {
 	Completed    *bool      `query:"completed"`
 }
 
-func (q *GetTodoQuery) validate() error {
+func (q *GetTodoQuery) Validate() error {
 	validate := validator.New()
 
 	if err := validate.Struct(q); err != nil {
