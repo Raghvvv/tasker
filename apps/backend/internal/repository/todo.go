@@ -106,7 +106,18 @@ func (r *TodoRepository) GetTodoByID(ctx context.Context, userID string, todoID 
 					com.id IS NOT NULL
 			),
 			'[]'::JSONB
-		) AS comments
+		) AS comments,
+		  COALESCE(
+				jsonb_agg(
+					to_jsonb(camel (att))
+					ORDER BY
+						att.created_at DESC
+				) FILTER (
+					WHERE
+						att.id IS NOT NULL
+				),
+				'[]'::JSONB
+			) AS attachments
 		
 	FROM
 		todos t
@@ -116,6 +127,8 @@ func (r *TodoRepository) GetTodoByID(ctx context.Context, userID string, todoID 
 		AND child.user_id=@user_id
 		LEFT JOIN todo_comments com ON com.todo_id=t.id
 		AND com.user_id=@user_id
+		LEFT JOIN todo_attatchments att ON att.todo_id=t.id
+		
 		
 	WHERE
 		t.id=@id
@@ -172,7 +185,18 @@ func (r *TodoRepository) GetTodos(ctx context.Context, userID string, query *tod
 					com.id IS NOT NULL
 			),
 			'[]'::JSONB
-		) AS comments
+		) AS comments,
+		 COALESCE(
+		 	jsonb_agg(to_jsonb(camel(att))
+			ORDER BY
+				att.created_at DESC
+		 	) FILTER (
+			 WHERE
+			 	att.id IS NOT NULL
+			),
+			'[]':: JSONB
+		)AS attatchments
+			
 
 	FROM
 		todos t
@@ -182,6 +206,8 @@ func (r *TodoRepository) GetTodos(ctx context.Context, userID string, query *tod
 		AND child.user_id=@user_id
 		LEFT JOIN todo_comments com ON com.todo_id=t.id
 		AND com.user_id=@user_id
+		LEFT JOIN todo_attatchments att ON att.todo_id=t.id
+		
 		
 `
 
@@ -261,10 +287,10 @@ func (r *TodoRepository) GetTodos(ctx context.Context, userID string, query *tod
 	} else {
 		stmt += " ORDER BY t.created_at DESC "
 	}
-	stmt += `LIMIT @limit OFFSET @offset`
+	stmt += " LIMIT @limit OFFSET @offset "
 	args["limit"] = *query.Limit
 	args["offset"] = (*query.Page - 1) * (*query.Limit)
-
+	fmt.Print(stmt)
 	rows, err := r.server.DB.Pool.Query(ctx, stmt, args)
 	if err != nil {
 		return nil, fmt.Errorf("failed to execute get todos query for user_id=%s: %w", userID, err)
@@ -279,7 +305,7 @@ func (r *TodoRepository) GetTodos(ctx context.Context, userID string, query *tod
 				Limit:      *query.Limit,
 				Total:      0,
 				TotalPages: 0,
-			}, nil
+			}, fmt.Errorf("0 rows from table:todos for user_id=%s: %w", userID, err)
 		}
 		return nil, fmt.Errorf("failed to collect rows from table:todos for user_id=%s: %w", userID, err)
 	}

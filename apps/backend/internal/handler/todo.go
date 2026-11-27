@@ -3,6 +3,9 @@ package handler
 import (
 	"net/http"
 
+	// "uuid"
+
+	"github.com/Raghvvv/tasker/internal/errs"
 	"github.com/Raghvvv/tasker/internal/middleware"
 	"github.com/Raghvvv/tasker/internal/model"
 
@@ -84,14 +87,70 @@ func (h *TodoHandler) DeleteTodo(c echo.Context) error {
 
 }
 
-// func (h *TodoHandler) GetTodoStats(c echo.Context) error {
-// 	return Handle(
-// 		h.Handler,
-// 		func(c echo.Context, payload *todo.GetTodoStatsPayload) (*todo.TodoStats, error) {
-// 			userID := middleware.GetUserID(c)
-// 			return h.todoservice.GetTodoStats(c, userID)
-// 		},
-// 		http.StatusOK,
-// 		&todo.GetTodoStatsPayload{},
-// 	)(c)
-// }
+//	func (h *TodoHandler) GetTodoStats(c echo.Context) error {
+//		return Handle(
+//			h.Handler,
+//			func(c echo.Context, payload *todo.GetTodoStatsPayload) (*todo.TodoStats, error) {
+//				userID := middleware.GetUserID(c)
+//				return h.todoservice.GetTodoStats(c, userID)
+//			},
+//			http.StatusOK,
+//			&todo.GetTodoStatsPayload{},
+//		)(c)
+//	}
+func (h *TodoHandler) UploadTodoAttatchment(ctx echo.Context) error {
+	return Handle(
+		h.Handler,
+		func(c echo.Context, payload *todo.UploadAttatchmentPayload) (*todo.TodoAttatchment, error) {
+			userId := middleware.GetUserID(c)
+			form, err := c.MultipartForm()
+			if err != nil {
+				return nil, errs.NewBadRequestError("failed to find form", false, nil, nil, nil)
+			}
+			files := form.File["file"]
+			if len(files) == 0 {
+				return nil, errs.NewBadRequestError("no files found", false, nil, nil, nil)
+			}
+			if len(files) > 1 {
+				return nil, errs.NewBadRequestError("only one file allowed per upload", false, nil, nil, nil)
+			}
+
+			return h.todoservice.UploadTodoAttatchment(ctx, userId, payload.TodoID, files[0])
+		},
+		http.StatusCreated,
+		&todo.UploadAttatchmentPayload{},
+	)(ctx)
+}
+
+func (h *TodoHandler) DeleteTodoAttachment(c echo.Context) error {
+	return HandleNoContent(
+		h.Handler,
+		func(c echo.Context, payload *todo.DeleteTodoAttatchmentPayload) error {
+			userID := middleware.GetUserID(c)
+			return h.todoservice.DeleteTodoAttatchment(payload.TodoId, c, userID, payload.AttatchmentId)
+		},
+		http.StatusNoContent,
+		&todo.DeleteTodoAttatchmentPayload{},
+	)(c)
+}
+
+func (h *TodoHandler) GetAttachmentPresignedURL(c echo.Context) error {
+	return Handle(
+		h.Handler,
+		func(c echo.Context, payload *todo.GetAttatchmentPresignedURLPayload) (*struct {
+			URL string `json:"url"`
+		}, error,
+		) {
+			userID := middleware.GetUserID(c)
+			url, err := h.todoservice.GetAttatchmentPresignedURL(c, userID, payload.TodoId, payload.AttatchmentID)
+			if err != nil {
+				return nil, err
+			}
+			return &struct {
+				URL string `json:"url"`
+			}{URL: url}, nil
+		},
+		http.StatusOK,
+		&todo.GetAttatchmentPresignedURLPayload{},
+	)(c)
+}

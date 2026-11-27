@@ -8,6 +8,7 @@ import (
 	"github.com/Raghvvv/tasker/internal/model"
 	"github.com/Raghvvv/tasker/internal/model/category"
 	"github.com/Raghvvv/tasker/internal/model/comment"
+
 	"github.com/google/uuid"
 )
 
@@ -53,9 +54,10 @@ type Todo struct {
 
 type Populatedtodo struct {
 	Todo
-	Category *category.Category `json:"category" db:"category"`
-	Children []Todo             `json:"children" db:"children"`
-	Comments []comment.Comment  `json:"comments" db:"comments"`
+	Category     *category.Category `json:"category" db:"category"`
+	Children     []Todo             `json:"children" db:"children"`
+	Comments     []comment.Comment  `json:"comments" db:"comments"`
+	Attatchments []TodoAttatchment  `json:"attatchments" db:"attatchments"`
 }
 
 type TodoStats struct {

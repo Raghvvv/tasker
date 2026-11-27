@@ -123,3 +123,32 @@ type GetTodoStatsPayload struct{}
 func (p *GetTodoStatsPayload) Validate() error {
 	return nil
 }
+
+type UploadAttatchmentPayload struct {
+	TodoID uuid.UUID `param:"id" validate:"required,uuid"`
+}
+
+func (p *UploadAttatchmentPayload) Validate() error {
+	validate := validator.New()
+	return validate.Struct(p)
+}
+
+type DeleteTodoAttatchmentPayload struct {
+	TodoId        uuid.UUID `param:"id" validate:"required,uuid"`
+	AttatchmentId uuid.UUID `param:"attatchmentId" validate:"required,uuid"`
+}
+
+func (p *DeleteTodoAttatchmentPayload) Validate() error {
+	validate := validator.New()
+	return validate.Struct(p)
+}
+
+type GetAttatchmentPresignedURLPayload struct {
+	TodoId        uuid.UUID `json:"id" validate:"required,uuid"`
+	AttatchmentID uuid.UUID `json:"attatchmentId" validate:"required,uuid"`
+}
+
+func (p *GetAttatchmentPresignedURLPayload) Validate() error {
+	validate := validator.New()
+	return validate.Struct(p)
+}
