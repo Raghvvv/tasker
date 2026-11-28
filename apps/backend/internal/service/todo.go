@@ -3,6 +3,7 @@ package service
 import (
 	// "uuid"
 
+	"fmt"
 	"mime/multipart"
 	"net/http"
 
@@ -340,6 +341,6 @@ func (s *TodoService) GetAttatchmentPresignedURL(
 		logger.Error().Err(err).Msg("failed to generate presigned URL")
 		return "", err
 	}
-
+	fmt.Println(url)
 	return url, nil
 }

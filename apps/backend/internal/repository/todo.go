@@ -117,7 +117,7 @@ func (r *TodoRepository) GetTodoByID(ctx context.Context, userID string, todoID 
 						att.id IS NOT NULL
 				),
 				'[]'::JSONB
-			) AS attachments
+			) AS attatchments
 		
 	FROM
 		todos t
@@ -215,7 +215,7 @@ func (r *TodoRepository) GetTodos(ctx context.Context, userID string, query *tod
 
 		"user_id": userID,
 	}
-	conditions := []string{" t.user_id=@userID "}
+	conditions := []string{" t.user_id=@user_id "}
 
 	if query.Status != nil {
 		conditions = append(conditions, "t.status=@status")
@@ -328,35 +328,35 @@ func (r *TodoRepository) UpdateTodo(ctx context.Context, userID string, payload 
 	}
 
 	if payload.Title != nil {
-		setClauses = append(setClauses, "title=@title")
+		setClauses = append(setClauses, " title=@title ")
 		args["title"] = *payload.Title
 	}
 	if payload.Description != nil {
-		setClauses = append(setClauses, "description=@description")
+		setClauses = append(setClauses, " description=@description ")
 		args["description"] = *payload.Description
 	}
 	if payload.Status != nil {
-		setClauses = append(setClauses, "status=@status")
+		setClauses = append(setClauses, " status=@status ")
 		args["status"] = *payload.Status
 	}
 	if payload.Priority != nil {
-		setClauses = append(setClauses, "priority=@priority")
+		setClauses = append(setClauses, " priority=@priority ")
 		args["priority"] = *payload.Priority
 	}
 	if payload.DueDate != nil {
-		setClauses = append(setClauses, "due_date=@dueDate")
+		setClauses = append(setClauses, " due_date=@dueDate ")
 		args["dueDate"] = *payload.DueDate
 	}
 	if payload.ParentTodoID != nil {
-		setClauses = append(setClauses, "parent_todo_id=@parentTodoID")
+		setClauses = append(setClauses, " parent_todo_id=@parentTodoID ")
 		args["parentTodoID"] = *payload.ParentTodoID
 	}
 	if payload.CategoryID != nil {
-		setClauses = append(setClauses, "category_id=@categoryID")
+		setClauses = append(setClauses, " category_id=@categoryID ")
 		args["categoryID"] = *payload.CategoryID
 	}
 	if payload.Metadata != nil {
-		setClauses = append(setClauses, "metadata=@metadata")
+		setClauses = append(setClauses, " metadata=@metadata ")
 		args["metadata"] = payload.Metadata
 	}
 	if len(setClauses) == 0 {
@@ -426,4 +426,152 @@ func (r *TodoRepository) CheckTodoExists(ctx context.Context, userID string, tod
 	}
 
 	return &todoItem, nil
+}
+
+func (r *TodoRepository) GetTodoAttatchment(
+	ctx context.Context,
+	todoID uuid.UUID,
+	attachmentID uuid.UUID,
+) (*todo.TodoAttatchment, error) {
+	stmt := `
+		SELECT
+			*
+		FROM
+			todo_attatchments
+		WHERE
+			todo_id = @todo_id
+			AND id = @attachment_id
+	`
+
+	rows, err := r.server.DB.Pool.Query(ctx, stmt, pgx.NamedArgs{
+		"todo_id":       todoID,
+		"attachment_id": attachmentID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get todo attachment: %w", err)
+	}
+
+	attachment, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[todo.TodoAttatchment])
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			code := "ATTACHMENT_NOT_FOUND"
+			return nil, errs.NewNotFoundError("attachment not found", false, &code)
+		}
+		return nil, fmt.Errorf("failed to collect row from table:todo_attachments: %w", err)
+	}
+
+	return &attachment, nil
+}
+
+func (r *TodoRepository) GetTodoAttatchments(
+	ctx context.Context,
+	todoID uuid.UUID,
+) ([]todo.TodoAttatchment, error) {
+	stmt := `
+		SELECT
+			*
+		FROM
+			todo_attatchments
+		WHERE
+			todo_id = @todo_id
+		ORDER BY
+			created_at DESC
+	`
+
+	rows, err := r.server.DB.Pool.Query(ctx, stmt, pgx.NamedArgs{
+		"todo_id": todoID,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to get todo attachments: %w", err)
+	}
+
+	attachments, err := pgx.CollectRows(rows, pgx.RowToStructByName[todo.TodoAttatchment])
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return []todo.TodoAttatchment{}, nil
+		}
+		return nil, fmt.Errorf("failed to collect rows from table:todo_attachments: %w", err)
+	}
+
+	return attachments, nil
+}
+
+func (r *TodoRepository) DeleteTodoAttatchment(
+	ctx context.Context,
+	todoID uuid.UUID,
+	attachmentID uuid.UUID,
+) error {
+	stmt := `
+		DELETE FROM todo_attachments
+		WHERE
+			todo_id = @todo_id
+			AND id = @attachment_id
+	`
+
+	result, err := r.server.DB.Pool.Exec(ctx, stmt, pgx.NamedArgs{
+		"todo_id":       todoID,
+		"attachment_id": attachmentID,
+	})
+	if err != nil {
+		return fmt.Errorf("failed to delete todo attachment: %w", err)
+	}
+
+	if result.RowsAffected() == 0 {
+		code := "ATTACHMENT_NOT_FOUND"
+		return errs.NewNotFoundError("attachment not found", false, &code)
+	}
+
+	return nil
+}
+
+func (r *TodoRepository) UploadTodoAttatchment(
+	ctx context.Context,
+	todoID uuid.UUID,
+	userID string,
+	s3Key string,
+	fileName string,
+	fileSize int64,
+	mimeType string,
+) (*todo.TodoAttatchment, error) {
+	stmt := `
+		INSERT INTO 
+			todo_attatchments (
+				todo_id,
+				file_name,
+				uploaded_by,
+				download_key,
+				file_size,
+				mime_type
+			)
+		VALUES
+			(
+				@todo_id,
+				@file_name,
+				@uploaded_by,
+				@download_key,
+				@file_size,
+				@mime_type
+			)
+		RETURNING
+			*
+	`
+
+	rows, err := r.server.DB.Pool.Query(ctx, stmt, pgx.NamedArgs{
+		"todo_id":      todoID,
+		"file_name":    fileName,
+		"uploaded_by":  userID,
+		"download_key": s3Key,
+		"file_size":    fileSize,
+		"mime_type":    mimeType,
+	})
+	if err != nil {
+		return nil, fmt.Errorf("failed to create todo attachment for todo_id=%s: %w", todoID.String(), err)
+	}
+
+	attachment, err := pgx.CollectOneRow(rows, pgx.RowToStructByName[todo.TodoAttatchment])
+	if err != nil {
+		return nil, fmt.Errorf("failed to collect row from table:todo_attachments: %w", err)
+	}
+
+	return &attachment, nil
 }

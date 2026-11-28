@@ -26,7 +26,7 @@ func (h CommentHandler) CreateComment(c echo.Context) error {
 	return Handle(
 		h.Handler,
 		func(c echo.Context, payload *comment.CreateCommentPayload) (*comment.Comment, error) {
-			userId := middleware.GetRequestID(c)
+			userId := middleware.GetUserID(c)
 			return h.commentService.AddComment(c, userId, payload.TodoId, payload)
 		},
 		http.StatusCreated,

@@ -21,7 +21,7 @@ func (p *CreateCategoryPayload) Validate() error {
 
 type UpdateCategoryPayload struct {
 	ID          uuid.UUID `param:"id" validate:"required,uuid"`
-	Name        *string   `json:"name" validate:"omitempty,min=1,max=100"`
+	Name        *string   `json:"name" validate:"omitempty,min=0,max=100"`
 	Color       *string   `json:"color" validate:"omitempty,hexcolor"`
 	Description *string   `json:"description" validate:"omitempty,max=255"`
 }

@@ -30,7 +30,7 @@ func (p *CreateTodoPayload) Validate() error {
 //---------------------------------------------------------------
 
 type UpdateTodoPayload struct {
-	ID           uuid.UUID  `query:"id" validate:"required,uuid"`
+	ID           uuid.UUID  `param:"id" validate:"required,uuid"`
 	Title        *string    `json:"title" validate:"omitempty,min=1,max=255"`
 	Description  *string    `json:"description" validate:"omitempty,max=1000"`
 	Status       *Status    `json:"status" validate:"omitempty,oneof=draft active completed archived"`
@@ -144,8 +144,8 @@ func (p *DeleteTodoAttatchmentPayload) Validate() error {
 }
 
 type GetAttatchmentPresignedURLPayload struct {
-	TodoId        uuid.UUID `json:"id" validate:"required,uuid"`
-	AttatchmentID uuid.UUID `json:"attatchmentId" validate:"required,uuid"`
+	TodoId        uuid.UUID `param:"id" validate:"required,uuid"`
+	AttatchmentID uuid.UUID `param:"attachmentId" validate:"required,uuid"`
 }
 
 func (p *GetAttatchmentPresignedURLPayload) Validate() error {

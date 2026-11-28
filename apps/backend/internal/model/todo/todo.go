@@ -31,7 +31,7 @@ const (
 
 type Metadata struct {
 	Tags       []string `json:"tags" db:"tags"`
-	Colour     *string  `json:"colour" db:"colour"`
+	Color      *string  `json:"color" db:"color"`
 	Difficulty *int     `json:"difficulty" db:"difficulty"`
 	Reminder   *string  `json:"reminder" db:"reminder"`
 }

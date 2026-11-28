@@ -6,6 +6,6 @@ type Category struct {
 	model.Base
 	UserID      string  `json:"userID" db:"user_id"`
 	Name        string  `json:"name" db:"name"`
-	Colour      string  `json:"colour" db:"colour"`
+	Color       string  `json:"color" db:"color"`
 	Description *string `json:"description" db:"description"`
 }

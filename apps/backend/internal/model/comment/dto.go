@@ -37,7 +37,7 @@ func (p *DeleteCommentPayload) Validate() error {
 
 type UpdateCommentPayload struct {
 	ID      uuid.UUID `param:"id" validate:"required,uuid"`
-	Content string    `json:"content" validate:"required, min=1,max=1000"`
+	Content string    `json:"content" validate:"required,min=1,max=1000"`
 }
 
 func (p *UpdateCommentPayload) Validate() error {

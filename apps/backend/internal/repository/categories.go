@@ -41,8 +41,8 @@ func (r *CategoryRepository) AddCategory(ctx context.Context, userID string, pay
 	args := pgx.NamedArgs{
 		"user_id":     userID,
 		"name":        payload.Name,
-		"colour":      payload.Name,
-		"description": *payload.Description,
+		"color":       payload.Color,
+		"description": payload.Description,
 	}
 	rows, error := r.server.DB.Pool.Query(ctx, stmt, args)
 	if error != nil {

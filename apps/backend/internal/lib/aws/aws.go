@@ -7,6 +7,8 @@ import (
 	"github.com/Raghvvv/tasker/internal/server"
 	"github.com/aws/aws-sdk-go-v2/config"
 	"github.com/aws/aws-sdk-go-v2/credentials"
+
+	sdkaws "github.com/aws/aws-sdk-go-v2/aws"
 )
 
 type AWS struct {
@@ -25,9 +27,12 @@ func NewAWS(server *server.Server) (*AWS, error) {
 			"",
 		)),
 	)
+
 	if err != nil {
 		return nil, fmt.Errorf("failed to load AWS config: %w", err)
 	}
+	// Disable automatic response checksum mode unless explicitly required.
+	cfg.ResponseChecksumValidation = sdkaws.ResponseChecksumValidationWhenRequired
 
 	return &AWS{
 		S3: NewS3Client(server, &cfg),

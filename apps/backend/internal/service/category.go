@@ -39,7 +39,7 @@ func (s *CategoryService) CreateCategory(ctx echo.Context, userID string,
 		Str("event", "category_created").
 		Str("category_id", categoryItem.ID.String()).
 		Str("name", categoryItem.Name).
-		Str("color", categoryItem.Colour).
+		Str("color", categoryItem.Color).
 		Msg("Category created successfully")
 
 	return categoryItem, nil
